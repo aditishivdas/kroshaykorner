@@ -547,5 +547,18 @@ p  { margin: 0; color: var(--ink-soft); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0ms !important; transition-duration: 0ms !important; }
 }
+/* FORCE SELECT WINDOW TO POP OUT AND BE SCROLLABLE */
+select, #productCategory, .form-group select {
+    max-height: 250px !important;
+    overflow-y: auto !important;
+    display: block !important;
+    position: relative !important;
+    z-index: 999999 !important;
+}
 
+/* STOP THE ADMIN FORM FROM CROPPING THE SELECTION OPTIONS */
+.modal, .modal-content, .admin-popup, form, .form-group {
+    overflow: visible !important;
+    max-height: none !important;
+}
 
