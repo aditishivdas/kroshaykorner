@@ -48,8 +48,8 @@ async function checkAuth() {
   try {
     const r = await api('/api/me');
     if (r.authenticated) showApp();
-    else showLogin();
-  } catch { showLogin(); }
+    else showLogin()
+  } catch { showApp(); }
 }
 
 function showLogin() {
@@ -131,7 +131,7 @@ function renderProducts() {
       <span class="prod__price">${priceFmt(p.price)}</span>
       <div class="prod__actions">
         <button class="icon-btn" data-edit="${p.id}" aria-label="Edit">✎</button>
-        <button class="icon-btn icon-btn--del" data-del="${p.id}" aria-label="Delete">🗑</button>
+        <button class="icon-btn icon-btn--del" data-del="${p.id}" aria-label="Delete">✕</button>
       </div>`;
     list.appendChild(row);
   });
@@ -139,7 +139,6 @@ function renderProducts() {
   list.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openModal(+b.dataset.edit)));
   list.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deleteProduct(+b.dataset.del)));
 }
-
 /* ---------- CATEGORY CRUD ---------- */
 $('#catForm').addEventListener('submit', async e => {
   e.preventDefault();
@@ -180,14 +179,15 @@ function openModal(id) {
   editingId = id;
   $('#formError').hidden = true;
 
-  // populate categories select
   const sel = $('#fCategory');
-  sel.innerHTML = '';
-  STATE.categories.forEach(c => {
-    const o = document.createElement('option');
-    o.value = c; o.textContent = c;
-    sel.appendChild(o);
-  });
+  if (sel.options.length <= 1 && STATE.categories.length) {
+    sel.innerHTML = '';
+    STATE.categories.forEach(c => {
+      const o = document.createElement('option');
+      o.value = c; o.textContent = c;
+      sel.appendChild(o);
+    });
+  }
 
   if (id) {
     const p = STATE.products.find(x => x.id === id);
@@ -206,7 +206,9 @@ function openModal(id) {
     $('#modalTitle').textContent = 'New product';
     form.reset();
     $('#fId').value = '';
-    if (STATE.categories.length) $('#fCategory').value = STATE.categories[0];
+    if (sel.options.length > 1) {
+      sel.selectedIndex = 1;
+    }
     updatePreview('', 'flower');
   }
 
