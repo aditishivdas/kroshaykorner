@@ -131,7 +131,7 @@ function renderProducts() {
       <span class="prod__price">${priceFmt(p.price)}</span>
       <div class="prod__actions">
         <button class="icon-btn" data-edit="${p.id}" aria-label="Edit">✎</button>
-        <button class="icon-btn icon-btn--del" data-del="${p.id}" aria-label="Delete">🗑</button>
+        <button class="icon-btn icon-btn--del" data-del="${p.id}" aria-label="Delete">✕</button>
       </div>`;
     list.appendChild(row);
   });
