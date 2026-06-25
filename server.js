@@ -84,9 +84,13 @@ app.get('/api/state', async (req, res, next) => {
   try {
     const cats = await pool.query('SELECT name FROM categories ORDER BY sort_order, name');
     const prods = await pool.query('SELECT id, name, category, price, description, image, art, badge FROM products ORDER BY sort_order, id');
-    res.json({ 
-      categories: cats.rows.map(c => c.name), 
-      products: prods.rows.map(p => ({ ...p, price: Number(p.price) })) 
+    
+    // This turns database rows into a flat list of names your Category dropdown can read!
+    const flatCategoriesList = cats.rows.map(c => c.name);
+
+    res.json({
+      categories: flatCategoriesList,
+      products: prods.rows.map(p => ({ ...p, price: Number(p.price) }))
     });
   } catch (e) { next(e); }
 });
