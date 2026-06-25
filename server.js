@@ -152,14 +152,12 @@
 app.get('/api/state', async (req, res, next) => {
   try {
     const cats = await pool.query('SELECT name FROM categories ORDER BY sort_order, name');
-    const prods = await pool.query('SELECT id, name, category, price, description, image, art, badge FROM products ORDER BY sort_order, id');
-    
-    // This extracts just the names into a clean text list that your dropdown menu expects!
-    const categoryStrings = cats.rows.map(row => row.name);
-
-    res.json({ 
-      categories: categoryStrings, 
-      products: prods.rows.map(p => ({ ...p, price: Number(p.price) })) 
+    const prods = await pool.query(
+      'SELECT id, name, category, price, description, image, art, badge FROM products ORDER BY sort_order, id'
+    );
+    res.json({
+      categories: cats.rows.map(c => c.name),
+      products: prods.rows.map(p => ({ ...p, price: Number(p.price) }))
     });
   } catch (e) { next(e); }
 });
