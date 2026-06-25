@@ -82,14 +82,21 @@ app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] })
 
 app.get('/api/state', async (req, res, next) => {
   try {
-    const cats = await pool.query('SELECT name FROM categories ORDER BY sort_order, name');
+    let cats = await pool.query('SELECT name FROM categories ORDER BY sort_order, name');
+    
+    // If the database is empty, this safely injects your categories right here!
+    if (cats.rows.length === 0) {
+      const defaultCats = ['Crochet Bags', 'Crochet Flowers', 'Crochet Toys', 'Crochet Accessories', 'Custom Handmade Gifts', 'New Arrivals'];
+      for (let i = 0; i < defaultCats.length; i++) {
+        await pool.query('INSERT INTO categories (name, sort_order) VALUES ($1, $2) ON CONFLICT DO NOTHING', [defaultCats[i], i]);
+      }
+      cats = await pool.query('SELECT name FROM categories ORDER BY sort_order, name');
+    }
+
     const prods = await pool.query('SELECT id, name, category, price, description, image, art, badge FROM products ORDER BY sort_order, id');
     
-    // This turns database rows into a flat list of names your Category dropdown can read!
-    const flatCategoriesList = cats.rows.map(c => c.name);
-
     res.json({
-      categories: flatCategoriesList,
+      categories: cats.rows.map(c => c.name),
       products: prods.rows.map(p => ({ ...p, price: Number(p.price) }))
     });
   } catch (e) { next(e); }
